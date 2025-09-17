@@ -4,17 +4,14 @@ from cachetools import cached, TTLCache
 from datetime import datetime
 import time
 
-# تنظیمات صفحه
 st.set_page_config(
     page_title="💰 Currency Converter",
     page_icon="💱",
     layout="wide"
 )
 
-# کش برای ذخیره نرخ ارز (30 دقیقه)
 ttl_cache = TTLCache(maxsize=100, ttl=1800)
 
-# لیست ارزهای معتبر
 CURRENCIES = [
     "USD", "EUR", "GBP", "JPY", "CAD", "AUD", "CHF", "CNY",
     "INR", "BRL", "RUB", "KRW", "MXN", "IDR", "TRY", "SAR",
@@ -23,7 +20,6 @@ CURRENCIES = [
 
 @cached(ttl_cache)
 def get_exchange_rate(base_currency, target_currency):
-    """دریافت نرخ تبدیل ارز از API"""
     try:
         url = f"https://api.exchangerate-api.com/v4/latest/{base_currency}"
         response = requests.get(url, timeout=10)
@@ -35,25 +31,20 @@ def get_exchange_rate(base_currency, target_currency):
         return None
 
 def convert_currency(amount, exchange_rate):
-    """تبدیل مقدار ارز"""
     try:
         return round(amount * exchange_rate, 2)
     except:
         return None
 
 def main():
-    # هدر برنامه
     st.title("💰 Currency Converter")
     st.markdown("---")
     
-    # ایجاد دو ستون برای布局 بهتر
     col1, col2 = st.columns([2, 1])
     
     with col1:
-        # بخش ورودی کاربر
         st.subheader("💱 Conversion Details")
         
-        # انتخاب ارزها
         col11, col12 = st.columns(2)
         with col11:
             base_currency = st.selectbox(
@@ -71,7 +62,6 @@ def main():
                 help="Select the currency you want to convert to"
             )
         
-        # ورودی مقدار
         amount = st.number_input(
             "Amount",
             min_value=0.01,
@@ -80,11 +70,9 @@ def main():
             help="Enter the amount you want to convert"
         )
         
-        # دکمه تبدیل
         convert_button = st.button("🚀 Convert", type="primary", use_container_width=True)
     
     with col2:
-        # اطلاعات جانبی
         st.subheader("ℹ️ Information")
         st.info("""
         **Features:**
@@ -100,14 +88,12 @@ def main():
         For real-time rates, refresh the page.
         """)
     
-    # انجام تبدیل وقتی دکمه زده شد
     if convert_button:
         if base_currency == target_currency:
             st.error("❌ Base and target currencies cannot be the same!")
             return
         
         with st.spinner("🔍 Fetching exchange rate..."):
-            # شبیه‌سازی delay برای UX بهتر
             time.sleep(0.5)
             
             exchange_rate = get_exchange_rate(base_currency, target_currency)
@@ -119,10 +105,8 @@ def main():
             result = convert_currency(amount, exchange_rate)
             
             if result is not None:
-                # نمایش نتیجه
                 st.success("✅ Conversion Successful!")
                 
-                # کارت نتیجه
                 st.markdown("---")
                 col_result1, col_result2, col_result3 = st.columns(3)
                 
@@ -147,10 +131,8 @@ def main():
                         delta=None
                     )
                 
-                # اطلاعات اضافی
                 st.caption(f"Last updated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
                 
-                # نمایش نرخ‌های دیگر
                 st.markdown("---")
                 st.subheader("📊 Other Popular Rates")
                 
@@ -169,12 +151,10 @@ def main():
             else:
                 st.error("❌ Conversion failed. Please check your inputs.")
 
-    # تاریخچه تبدیل‌ها (با session state)
     if 'history' not in st.session_state:
         st.session_state.history = []
     
     if convert_button and result is not None:
-        # اضافه کردن به تاریخچه
         conversion = {
             'date': datetime.now().strftime("%H:%M:%S"),
             'from': f"{amount} {base_currency}",
@@ -183,11 +163,9 @@ def main():
         }
         st.session_state.history.insert(0, conversion)
         
-        # محدود کردن تاریخچه به 5 مورد آخر
         if len(st.session_state.history) > 5:
             st.session_state.history = st.session_state.history[:5]
     
-    # نمایش تاریخچه
     if st.session_state.history:
         st.markdown("---")
         st.subheader("📋 Recent Conversions")
@@ -201,6 +179,5 @@ def main():
             with col_hist3:
                 st.write(f"Rate: {conv['rate']:.4f}")
 
-# اجرای برنامه
 if __name__ == "__main__":
     main()
