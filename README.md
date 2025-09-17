@@ -4,7 +4,6 @@ A modern, responsive web application for real-time currency conversion built wit
 
 ![Currency Converter](https://img.shields.io/badge/Streamlit-FF4B4B?style=for-the-badge&logo=Streamlit&logoColor=white)
 ![Python](https://img.shields.io/badge/Python-3.8%2B-blue?style=for-the-badge&logo=python)
-![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
 
 ## ✨ Features
 
